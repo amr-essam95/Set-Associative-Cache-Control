@@ -24,6 +24,30 @@ output reg outValid0,outValid1,outValid2,outValid3;
 input [31:0]inputData;
 input clk;
 
+initial
+begin
+
+data0[10]=0;
+valid0[10]=1;
+tag0[10]=10;
+
+data1[10]=1000;
+valid1[10]=1;
+tag1[10]=11;
+
+data2[10]=2000;
+valid2[10]=1;
+tag2[10]=12;
+
+data3[10]=3000;
+valid3[10]=1;
+tag3[10]=13;
+
+data0[9]=10000;
+valid0[9]=1;
+tag0[9]=10;
+
+end
 
 
 
@@ -93,15 +117,27 @@ endmodule
 module testingCache;
 
 reg clk;
-reg [7:0]x [0:3] ;
+reg [31:0]inToCache;
+wire [21:0] outTag0,outTag1,outTag2,outTag3;
+wire outValid0,outValid1,outValid2,outValid3;
+wire [31:0] outData0,outData1,outData2,outData3;
 
 initial
 begin
-$monitor("%d",x[1]);
+$monitor("clk=%d address=%d outTag0=%d outTag1=%d outTag2=%d outTag3=%d outData1=%d",clk,inToCache,outTag0,outTag1,outTag2,outTag3,outData1);
+clk=0;
 #5
-x[0][7:0]=10;
+inToCache=11304;
 #5
-x[1][7:0]=3;
+inToCache=10276;
+
+#30
+$finish;
+
+
+
+
+
 
 end
 
@@ -109,9 +145,11 @@ always
 begin
 #5
 clk=~clk;
-#30
-$finish;
+
 end
+ModellingCache x(0,inToCache,0,outTag0,outTag1,outTag2,outTag3,outValid0,outValid1,outValid2,outValid3,outData0,outData1,outData2,outData3,clk);
+
+
 
 endmodule
 
