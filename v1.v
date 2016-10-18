@@ -90,4 +90,22 @@ FourToOneMux h(q,in0,in1,in2,in3,sel);
 
 endmodule
 
+module Comparator(in1,in2,out);
 
+input wire[0:21] in1,in2;
+output reg[0:1] out;
+
+always@(in1 or in2)
+begin
+
+if(in1>in2)
+out=1;
+else if (in1<in2)
+out=2;
+else if (in1==in2)
+out=0;
+else
+out=2'bx;
+
+end
+endmodule
