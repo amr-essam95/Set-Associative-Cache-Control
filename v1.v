@@ -1,6 +1,6 @@
 module ModellingCache(operation,inToCache,inputData,outTag0,outTag1,outTag2,outTag3,outValid0,outValid1,outValid2,outValid3,outData0,outData1,outData2,outData3,clk);
 //if operation =0 then read and otherwise write
-input operation;
+input  operation;
 
 reg[31:0] data0 [0:256];
 reg[31:0] data1 [0:256];
@@ -24,12 +24,13 @@ output reg outValid0,outValid1,outValid2,outValid3;
 input [31:0]inputData;
 input clk;
 
+
 initial
 begin
 
-data0[10]=0;
-valid0[10]=1;
-tag0[10]=10;
+//data0[10]=0;
+valid0[10]=0;
+//tag0[10]=10;
 
 data1[10]=1000;
 valid1[10]=1;
@@ -75,35 +76,42 @@ outValid0=valid0[inToCache[9:2]];
 end
 else if(operation==1)
 begin 
-
-	if(valid0[inToCache[9:2]]==0)
+//The second conditions is just for stimulation since initially all variables are x
+	if(valid0[inToCache[9:2]]==0||valid0[inToCache[9:2]]==x)
 	begin 
 	valid0[inToCache[9:2]]=1;
 	data0[inToCache[9:2]]=inputData;
 	tag0[inToCache[9:2]]=inToCache[31:10];
 	end
 
-	else if(valid1[inToCache[9:2]]==0)
+	else if(valid1[inToCache[9:2]]==0||valid0[inToCache[9:2]]==x)
 	begin
 	valid1[inToCache[9:2]]=1;
 	data1[inToCache[9:2]]=inputData;
 	tag1[inToCache[9:2]]=inToCache[31:10];
 	end
 
-	else if(valid2[inToCache[9:2]]==0)
+	else if(valid2[inToCache[9:2]]==0||valid0[inToCache[9:2]]==x)
 	begin
 	valid2[inToCache[9:2]]=1;
 	data2[inToCache[9:2]]=inputData;
 	tag2[inToCache[9:2]]=inToCache[31:10];
 	end
 
-	else if(valid3[inToCache[9:2]]==0)
+	else if(valid3[inToCache[9:2]]==0||valid0[inToCache[9:2]]==x)
 	begin
 	valid3[inToCache[9:2]]=1;
 	data3[inToCache[9:2]]=inputData;
 	tag3[inToCache[9:2]]=inToCache[31:10];
 	end
 	//There will be else that will be changed later to the idea of least recently used
+	else
+	begin
+	valid0[inToCache[9:2]]=1;
+	data0[inToCache[9:2]]=inputData;
+	tag0[inToCache[9:2]]=inToCache[31:10];
+	end
+
 
 
 end
@@ -121,15 +129,21 @@ reg [31:0]inToCache;
 wire [21:0] outTag0,outTag1,outTag2,outTag3;
 wire outValid0,outValid1,outValid2,outValid3;
 wire [31:0] outData0,outData1,outData2,outData3;
+reg op;
+reg[31:0] data;
 
 initial
 begin
-$monitor("clk=%d address=%d outTag0=%d outTag1=%d outTag2=%d outTag3=%d outData1=%d",clk,inToCache,outTag0,outTag1,outTag2,outTag3,outData1);
+$monitor($time,,"clk=%d op=%d address=%d outTag0=%d  outData0=%d",clk,op,inToCache,outTag0,outData0);
 clk=0;
-#5
-inToCache=11304;
-#5
-inToCache=10276;
+op=1;
+data=15000;
+inToCache=10280;
+
+#10
+op=0;
+inToCache=10280;
+
 
 #30
 $finish;
@@ -147,7 +161,7 @@ begin
 clk=~clk;
 
 end
-ModellingCache x(0,inToCache,0,outTag0,outTag1,outTag2,outTag3,outValid0,outValid1,outValid2,outValid3,outData0,outData1,outData2,outData3,clk);
+ModellingCache x(op,inToCache,data,outTag0,outTag1,outTag2,outTag3,outValid0,outValid1,outValid2,outValid3,outData0,outData1,outData2,outData3,clk);
 
 
 
