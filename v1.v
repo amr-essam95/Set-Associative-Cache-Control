@@ -127,10 +127,10 @@ module ModellingRam(operation,inputAddress,inputData,outputData,clk);
 
 
 
-reg [31:0] data [0:1000];
+reg [31:0] data [0:1024];
 
 input operation;
-input [31:0] inputAddress;
+input [9:0] inputAddress;
 input [31:0] inputData;
 output reg [31:0] outputData;
 input clk;
@@ -139,21 +139,71 @@ reg wordAddress;
 always@(posedge clk)
 begin
 
-wordAddress=inputAddress[11:2];
+
 if(operation==0)
 begin
+wordAddress=inputAddress/4;
 outputData=data[wordAddress];
 end
 
 else if(operation==1)
 begin
-
-wordAddress=inputAddress[11:2];
+wordAddress=inputAddress/4;
 data[wordAddress]=inputData;
 
 end
 
 
+
+end
+initial 
+begin
+data[0]=500;
+end
+
+
+
+endmodule
+/////////////////////////////////////////////////////////////////
+module testingRam;
+
+reg clk;
+reg[9:0] inputAddress;
+reg[31:0] inputData;
+wire[31:0] outputData;
+reg operation;
+
+initial 
+begin
+
+$monitor($time,,"clk=%d op=%d add=%d data=%d out=%d",clk,operation,inputAddress,inputData,outputData);
+
+clk=0;
+operation=1;
+inputAddress=4;
+inputData=10;
+#8
+operation=1;
+inputAddress=8;
+inputData=20;
+#10
+operation=0;
+inputAddress=4;
+#10
+operation=0;
+inputAddress=0;
+#50
+$finish;
+
+
+end
+
+ModellingRam hello(operation,inputAddress,inputData,outputData,clk);
+
+always
+begin
+#5
+clk=~clk;
 end
 
 
@@ -319,5 +369,16 @@ FourToOneMux h(q,in0,in1,in2,in3,sel);
 or(hit,x,y,z,w);
 
 endmodule
+
+
+//////////////////////////////////////////////////
+/*
+module Controller(operation,inAdd,inputData,outputData);
+
+
+
+
+endmodule
+*/
 
 
