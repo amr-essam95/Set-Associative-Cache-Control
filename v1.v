@@ -28,9 +28,9 @@ input clk;
 initial
 begin
 
-//data0[10]=0;
-valid0[10]=0;
-//tag0[10]=10;
+data0[10]=0;
+valid0[10]=1;
+tag0[10]=10;
 
 data1[10]=1000;
 valid1[10]=1;
@@ -77,28 +77,28 @@ end
 else if(operation==1)
 begin 
 //The second conditions is just for stimulation since initially all variables are x
-	if(valid0[inToCache[9:2]]==0||valid0[inToCache[9:2]]==x)
+	if(valid0[inToCache[9:2]]==0||valid0[inToCache[9:2]]==1'bx)
 	begin 
 	valid0[inToCache[9:2]]=1;
 	data0[inToCache[9:2]]=inputData;
 	tag0[inToCache[9:2]]=inToCache[31:10];
 	end
 
-	else if(valid1[inToCache[9:2]]==0||valid0[inToCache[9:2]]==x)
+	else if(valid1[inToCache[9:2]]==0||valid0[inToCache[9:2]]==1'bx)
 	begin
 	valid1[inToCache[9:2]]=1;
 	data1[inToCache[9:2]]=inputData;
 	tag1[inToCache[9:2]]=inToCache[31:10];
 	end
 
-	else if(valid2[inToCache[9:2]]==0||valid0[inToCache[9:2]]==x)
+	else if(valid2[inToCache[9:2]]==0||valid0[inToCache[9:2]]==1'bx)
 	begin
 	valid2[inToCache[9:2]]=1;
 	data2[inToCache[9:2]]=inputData;
 	tag2[inToCache[9:2]]=inToCache[31:10];
 	end
 
-	else if(valid3[inToCache[9:2]]==0||valid0[inToCache[9:2]]==x)
+	else if(valid3[inToCache[9:2]]==0||valid0[inToCache[9:2]]==1'bx)
 	begin
 	valid3[inToCache[9:2]]=1;
 	data3[inToCache[9:2]]=inputData;
@@ -121,6 +121,48 @@ end
 
 
 endmodule
+/////////////////////////////////////////////////////////////////
+
+module ModellingRam(operation,inputAddress,inputData,outputData,clk);
+
+
+
+reg [31:0] data [0:1000];
+
+input operation;
+input [31:0] inputAddress;
+input [31:0] inputData;
+output reg [31:0] outputData;
+input clk;
+reg wordAddress;
+
+always@(posedge clk)
+begin
+
+wordAddress=inputAddress[11:2];
+if(operation==0)
+begin
+outputData=data[wordAddress];
+end
+
+else if(operation==1)
+begin
+
+wordAddress=inputAddress[11:2];
+data[wordAddress]=inputData;
+
+end
+
+
+end
+
+
+endmodule
+
+
+
+
+
 /////////////////////////////////////////////////////////////////
 module testingCache;
 
@@ -237,7 +279,7 @@ module tb10;
 reg [31:0] in0,in1,in2,in3;
 wire [1:0] sel;
 wire [31:0] q;
-wire x,y,z,w;
+wire x,y,z,w,hit;
 //These variables are for testing the comparator instead of the tag in the 4 blocks of the cache 
 // coriginal is the tag of the word sent from the processor
 //we will compare the tag sent from the processor with tha 4 tags i will generate to stimulate the 4
@@ -274,6 +316,7 @@ and(w,1,out3);
 
 InputToMux m(x,y,z,w,sel);
 FourToOneMux h(q,in0,in1,in2,in3,sel);
+or(hit,x,y,z,w);
 
 endmodule
 
