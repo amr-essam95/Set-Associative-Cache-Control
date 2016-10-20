@@ -28,25 +28,22 @@ input clk;
 initial
 begin
 
-data0[10]=0;
-valid0[10]=1;
-tag0[10]=10;
+data0[0]=10000;
+valid0[0]=1;
+tag0[0]=0;
 
-data1[10]=1000;
-valid1[10]=1;
-tag1[10]=11;
+data1[0]=2000;
+valid1[0]=1;
+tag1[0]=10;
 
-data2[10]=2000;
-valid2[10]=1;
-tag2[10]=12;
+data2[0]=3000;
+valid2[0]=1;
+tag2[0]=12;
 
-data3[10]=3000;
-valid3[10]=1;
-tag3[10]=13;
+data3[0]=4000;
+valid3[0]=1;
+tag3[0]=13;
 
-data0[9]=10000;
-valid0[9]=1;
-tag0[9]=10;
 
 end
 
@@ -69,9 +66,9 @@ outData2=data2[inToCache[9:2]];
 outData3=data3[inToCache[9:2]];
 
 outValid0=valid0[inToCache[9:2]];
-outValid0=valid0[inToCache[9:2]];
-outValid0=valid0[inToCache[9:2]];
-outValid0=valid0[inToCache[9:2]];
+outValid1=valid1[inToCache[9:2]];
+outValid2=valid2[inToCache[9:2]];
+outValid3=valid3[inToCache[9:2]];
 
 end
 else if(operation==1)
@@ -130,7 +127,7 @@ module ModellingRam(operation,inputAddress,inputData,outputData,clk);
 reg [31:0] data [0:1024];
 
 input operation;
-input [9:0] inputAddress;
+input [31:0] inputAddress;
 input [31:0] inputData;
 output reg [31:0] outputData;
 input clk;
@@ -165,6 +162,7 @@ end
 
 endmodule
 /////////////////////////////////////////////////////////////////
+/*
 module testingRam;
 
 reg clk;
@@ -208,12 +206,13 @@ end
 
 
 endmodule
-
+*/
 
 
 
 
 /////////////////////////////////////////////////////////////////
+/*
 module testingCache;
 
 reg clk;
@@ -258,7 +257,7 @@ ModellingCache x(op,inToCache,data,outTag0,outTag1,outTag2,outTag3,outValid0,out
 
 
 endmodule
-
+*/
 
 /////////////////////////////////////////////////////////////////
 module FourToOneMux(z,in0,in1,in2,in3,sel);
@@ -324,6 +323,7 @@ out=0;
 end
 endmodule
 
+/*
 module tb10;
 
 reg [31:0] in0,in1,in2,in3;
@@ -369,16 +369,63 @@ FourToOneMux h(q,in0,in1,in2,in3,sel);
 or(hit,x,y,z,w);
 
 endmodule
-
-
-//////////////////////////////////////////////////
-/*
-module Controller(operation,inAdd,inputData,outputData);
-
-
-
-
-endmodule
 */
 
 
+//////////////////////////////////////////////////
+
+module Controller(operation,inputData,outputData);
+
+output reg operation;////////////
+reg [31:0] inputAdd;////////////
+input [31:0] inputData;
+output [31:0] outputData;
+reg clk;
+wire [1:0] sel;
+wire out0,out1,out2,out3;
+wire x,y,z,w,hit;
+wire [31:0] outData0,outData1,outData2,outData3;
+wire [21:0] outTag0,outTag1,outTag2,outTag3;
+wire outValid0,outValid1,outValid2,outValid3;
+
+initial 
+begin
+
+$monitor($time,,"hit=%d outputData=%d",hit,outputData);
+clk=0;
+operation=0;
+inputAdd=0;
+
+#30
+$finish;
+
+end
+
+
+
+
+always
+begin
+#5
+clk=~clk;
+end
+
+
+ModellingCache step1(operation,inputAdd,inputData,outTag0,outTag1,outTag2,outTag3,outValid0,outValid1,outValid2,outValid3,outData0,outData1,outData2,outData3,clk);
+
+Comparator c1(outTag0,inputAdd[31:10],out0);
+Comparator c2(outTag1,inputAdd[31:10],out1);
+Comparator c3(outTag2,inputAdd[31:10],out2);
+Comparator c4(outTag3,inputAdd[31:10],out3);
+and(x,outValid0,out0);
+and(y,outValid1,out1);
+and(z,outValid2,out2);
+and(w,outValid3,out3);
+
+
+InputToMux step2(x,y,z,w,sel);
+FourToOneMux step3(outputData,outData0,outData1,outData2,outData3,sel);
+or(hit,x,y,z,w);
+
+
+endmodule
