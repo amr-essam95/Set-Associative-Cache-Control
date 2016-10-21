@@ -44,6 +44,22 @@ data3[0]=4000;
 valid3[0]=1;
 tag3[0]=13;
 
+data0[1]=20000;
+valid0[1]=1;
+tag0[1]=0;
+
+data1[1]=2000;
+valid1[1]=1;
+tag1[1]=10;
+
+data2[1]=3000;
+valid2[1]=1;
+tag2[1]=12;
+
+data3[4]=4000;
+valid3[4]=1;
+tag3[4]=13;
+
 
 end
 
@@ -69,6 +85,8 @@ outValid0=valid0[inToCache[9:2]];
 outValid1=valid1[inToCache[9:2]];
 outValid2=valid2[inToCache[9:2]];
 outValid3=valid3[inToCache[9:2]];
+
+
 
 end
 else if(operation==1)
@@ -120,27 +138,36 @@ end
 endmodule
 /////////////////////////////////////////////////////////////////
 
-module ModellingRam(operation,inputAddress,inputData,outputData,clk);
+module ModellingRam(hit,operation,inputAddress,inputData,outputData,clk);
 
 
 
 reg [31:0] data [0:1024];
-
-input operation;
+//input hit;
+//inout operation;
+input operation,hit;
 input [31:0] inputAddress;
-input [31:0] inputData;
+inout [31:0] inputData;
 output reg [31:0] outputData;
 input clk;
 reg wordAddress;
-
+wire oldop;
+//reg value;
+//reg check;
+assign oldop=operation;
+//assign operation=(check)?value:oldop;
+//assign inputData=(check)?outputData:x;
 always@(posedge clk)
 begin
 
-
-if(operation==0)
+if(hit==0||oldop==1)
 begin
+if(oldop==0)
+begin
+//check=1;
 wordAddress=inputAddress/4;
 outputData=data[wordAddress];
+//value=1;
 end
 
 else if(operation==1)
@@ -148,6 +175,7 @@ begin
 wordAddress=inputAddress/4;
 data[wordAddress]=inputData;
 
+end
 end
 
 
@@ -374,12 +402,16 @@ endmodule
 
 //////////////////////////////////////////////////
 
-module Controller(operation,inputData,outputData);
 
-output reg operation;////////////
-reg [31:0] inputAdd;////////////
+module Controller(operation,inputAdd,inputData,outputData);
+
+input operation;////////////
+input [31:0] inputAdd;////////////
 input [31:0] inputData;
 output [31:0] outputData;
+
+wire [31:0] outputData1;
+
 reg clk;
 wire [1:0] sel;
 wire out0,out1,out2,out3;
@@ -388,20 +420,15 @@ wire [31:0] outData0,outData1,outData2,outData3;
 wire [21:0] outTag0,outTag1,outTag2,outTag3;
 wire outValid0,outValid1,outValid2,outValid3;
 
-initial 
-begin
 
-$monitor($time,,"hit=%d outputData=%d",hit,outputData);
-clk=0;
-operation=0;
-inputAdd=0;
 
-#30
-$finish;
+initial
+begin 
 
+$monitor($time,,"op=%d inputData=%d inputAdd=%d hit=%d outputData=%d sel=%d clk=%d tag0=%d outputData1=%d",operation,
+inputData,inputAdd,hit,outputData,sel,clk,outTag0,outputData1);
+clk=1;
 end
-
-
 
 
 always
@@ -427,5 +454,67 @@ InputToMux step2(x,y,z,w,sel);
 FourToOneMux step3(outputData,outData0,outData1,outData2,outData3,sel);
 or(hit,x,y,z,w);
 
+ModellingRam step4(hit,operation,inputAdd,inputData,outputData1,clk);
+
+
+/*
+ModellingCache step5(~hit,inputAdd,outputData1,outTag0,outTag1,outTag2,outTag3,outValid0,outValid1,outValid2,outValid3,outData0,outData1,outData2,outData3,~clk);
+*/
 
 endmodule
+
+
+module tb;
+
+reg [31:0] inputData;
+reg [31:0] inputAdd;
+wire [31:0] outputData;
+reg op;
+
+initial 
+begin
+
+//$monitor($time,,"op=%d add=%d data=%d",op,inputAdd,outputData);
+
+op=1;
+inputAdd=20;
+inputData=10;
+#10
+op=0;
+inputAdd=20;
+
+
+
+/*
+#10
+inputAdd=10;
+inputData=35;
+op=1;
+#20
+op=0;
+inputAdd=15;
+#10
+op=0;
+inputAdd=10;
+*/
+
+#100
+$finish;
+
+
+
+
+end
+
+Controller x(op,inputAdd,inputData,outputData);
+
+
+endmodule
+
+
+
+
+
+
+
+
