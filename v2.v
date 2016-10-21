@@ -24,7 +24,7 @@ reg valid3 [0:256];
 /////////////////////////
 //MODELLING RAM
 /////////////////////////
-reg [31:0] data [0:1024];
+reg [31:0] data [0:32768];
 reg wordAddress;
 /////////////////////////
 reg [1:0] sel;
@@ -34,6 +34,7 @@ reg [31:0] outData0,outData1,outData2,outData3;
 reg [31:0] output1;
 reg [21:0] outTag0,outTag1,outTag2,outTag3;
 reg outValid0,outValid1,outValid2,outValid3;
+integer k;
 
 always@(posedge clk)
 begin
@@ -112,10 +113,50 @@ end
 else if(hit==0)
 begin
 
-tag0[inputAdd[9:2]]=inputAdd[31:10];
-valid0[inputAdd[9:2]]=1;
-data0[inputAdd[9:2]]=data[inputAdd];
-outputData=data[inputAdd];
+if(valid0[inputAdd[9:2]]==0||valid0[inputAdd[9:2]]==1'bx)
+	begin 
+	tag0[inputAdd[9:2]]=inputAdd[31:10];
+	valid0[inputAdd[9:2]]=1;
+	data0[inputAdd[9:2]]=data[inputAdd];
+	outputData=data[inputAdd];
+	end
+
+	else if(valid1[inputAdd[9:2]]==0||valid1[inputAdd[9:2]]==1'bx)
+	begin
+	tag1[inputAdd[9:2]]=inputAdd[31:10];
+	valid1[inputAdd[9:2]]=1;
+	data1[inputAdd[9:2]]=data[inputAdd];
+	outputData=data[inputAdd];
+	end
+
+	else if(valid2[inputAdd[9:2]]==0||valid2[inputAdd[9:2]]==1'bx)
+	begin
+	tag2[inputAdd[9:2]]=inputAdd[31:10];
+	valid2[inputAdd[9:2]]=1;
+	data2[inputAdd[9:2]]=data[inputAdd];
+	outputData=data[inputAdd];
+	end
+
+	else if(valid3[inputAdd[9:2]]==0||valid3[inputAdd[9:2]]==1'bx)
+	begin
+	tag3[inputAdd[9:2]]=inputAdd[31:10];
+	valid3[inputAdd[9:2]]=1;
+	data3[inputAdd[9:2]]=data[inputAdd];
+	outputData=data[inputAdd];
+	end
+	//There will be else that will be changed later to the idea of least recently used
+	else
+	begin
+	tag0[inputAdd[9:2]]=inputAdd[31:10];
+	valid0[inputAdd[9:2]]=1;
+	data0[inputAdd[9:2]]=data[inputAdd];
+	outputData=data[inputAdd];
+	end
+
+
+
+
+
 
 end
 
@@ -125,12 +166,54 @@ end
 
 else if(op==1)
 begin
+hit=1'bX;
+if((valid0[inputAdd[9:2]]==0)||(valid0[inputAdd[9:2]]==1'bx))
+	begin 
+	tag0[inputAdd[9:2]]=inputAdd[31:10];
+	valid0[inputAdd[9:2]]=1;
+	data0[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+	outputData=32'bx;
+	end
 
-tag0[inputAdd[9:2]]=inputAdd[31:0];
-valid0[inputAdd[9:2]]=1;
-data0[inputAdd[9:2]]=inputData;
-data[inputAdd]=inputData;
+	else if(valid1[inputAdd[9:2]]==0||valid1[inputAdd[9:2]]==1'bx)
+	begin
+	tag1[inputAdd[9:2]]=inputAdd[31:10];
+	valid1[inputAdd[9:2]]=1;
+	data1[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+	outputData=32'bx;
+	end
 
+	else if(valid2[inputAdd[9:2]]==0||valid2[inputAdd[9:2]]==1'bx)
+	begin
+	tag2[inputAdd[9:2]]=inputAdd[31:10];
+	valid2[inputAdd[9:2]]=1;
+	data2[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+	outputData=32'bx;
+	end
+
+	else if(valid3[inputAdd[9:2]]==0||valid3[inputAdd[9:2]]==1'bx)
+	begin
+	tag3[inputAdd[9:2]]=inputAdd[31:10];
+	valid3[inputAdd[9:2]]=1;
+	data3[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+	outputData=32'bx;
+	end
+	//There will be else that will be changed later to the idea of least recently used
+	/*
+	else
+	begin
+	tag0[inputAdd[9:2]]=inputAdd[31:10];
+	valid0[inputAdd[9:2]]=1;
+	data0[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+	outputData=32'bx;
+	end
+	*/
+	
 
 end
 
@@ -140,42 +223,13 @@ end
 reg clk;
 initial
 begin
-$monitor($time,,"op=%d inputAdd=%d hit=%d outputData=%d clk=%d ",op,inputAdd,hit,outputData,clk);
-
+$monitor($time,,"op=%d inputAdd=%d hit=%d outputData=%d clk=%d tag0=%d tag1=%d tag2=%d tag3=%d tag=%d %d",op,inputAdd,hit,outputData,clk,outTag0,outTag1,outTag2,outTag3,inputAdd[31:10],k);
 clk=1;
-data[0]=10000;
-//valid[0]=1;
-//tag[0]=0;
 
-data1[0]=2000;
-valid1[0]=1;
-tag1[0]=10;
 
-data2[0]=3000;
-valid2[0]=1;
-tag2[0]=12;
-
-data3[0]=4000;
-valid3[0]=1;
-tag3[0]=13;
-
-data0[1]=20000;
-valid0[1]=1;
-tag0[1]=0;
-
-data1[1]=2000;
-valid1[1]=1;
-tag1[1]=10;
-
-data2[1]=3000;
-valid2[1]=1;
-tag2[1]=12;
-
-data3[4]=4000;
-valid3[4]=1;
-tag3[4]=13;
 
 end
+
 always
 begin
 #2 
@@ -201,16 +255,42 @@ begin
 
 
 
-op=0;
-inputAdd=0;
-#10
-op=0;
-inputAdd=10;
-#10
-op=0;
-inputAdd=0;
 
-#50
+op=1;
+inputAdd=64;
+inputData=111;
+#3
+op=1;
+inputAdd=1088;
+inputData=222;
+#3
+op=1;
+inputAdd=3136;
+inputData=333;
+#4
+op=1;
+inputAdd=7232;
+inputData=333;
+
+/*
+op=1;
+inputAdd=2112;
+inputData=555;
+*/
+#4
+op=1;
+inputAdd=2112;
+inputData=5000;
+#3
+op=0;
+inputAdd=2112;
+#3
+op=0;
+inputAdd=2112;
+#3
+
+
+
 $finish;
 
 end
@@ -219,3 +299,5 @@ end
 Controller2 c(op,inputAdd,inputData,outputData);
 
 endmodule
+
+
