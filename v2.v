@@ -22,6 +22,11 @@ reg valid1 [0:256];
 reg valid2 [0:256];
 reg valid3 [0:256];
 /////////////////////////
+reg ref0 [0:256];
+reg ref1 [0:256];
+reg ref2 [0:256];
+reg ref3 [0:256];
+//////////////////////////
 //MODELLING RAM
 /////////////////////////
 reg [31:0] data [0:32768];
@@ -171,6 +176,7 @@ if((valid0[inputAdd[9:2]]==0)||(valid0[inputAdd[9:2]]==1'bx))
 	begin 
 	tag0[inputAdd[9:2]]=inputAdd[31:10];
 	valid0[inputAdd[9:2]]=1;
+	ref0[inputAdd[9:2]]=1;
 	data0[inputAdd[9:2]]=inputData;
 	data[inputAdd]=inputData;
 	outputData=32'bx;
@@ -180,6 +186,7 @@ if((valid0[inputAdd[9:2]]==0)||(valid0[inputAdd[9:2]]==1'bx))
 	begin
 	tag1[inputAdd[9:2]]=inputAdd[31:10];
 	valid1[inputAdd[9:2]]=1;
+	ref1[inputAdd[9:2]]=1;
 	data1[inputAdd[9:2]]=inputData;
 	data[inputAdd]=inputData;
 	outputData=32'bx;
@@ -189,6 +196,7 @@ if((valid0[inputAdd[9:2]]==0)||(valid0[inputAdd[9:2]]==1'bx))
 	begin
 	tag2[inputAdd[9:2]]=inputAdd[31:10];
 	valid2[inputAdd[9:2]]=1;
+	ref2[inputAdd[9:2]]=1;
 	data2[inputAdd[9:2]]=inputData;
 	data[inputAdd]=inputData;
 	outputData=32'bx;
@@ -198,16 +206,60 @@ if((valid0[inputAdd[9:2]]==0)||(valid0[inputAdd[9:2]]==1'bx))
 	begin
 	tag3[inputAdd[9:2]]=inputAdd[31:10];
 	valid3[inputAdd[9:2]]=1;
+	ref3[inputAdd[9:2]]=1;
 	data3[inputAdd[9:2]]=inputData;
 	data[inputAdd]=inputData;
 	outputData=32'bx;
 	end
 	//There will be else that will be changed later to the idea of least recently used
 	
+	else if(ref0[inputAdd[9:2]]==0)
+	begin 
+	tag0[inputAdd[9:2]]=inputAdd[31:10];
+	valid0[inputAdd[9:2]]=1;
+	ref0[inputAdd[9:2]]=1;
+	data0[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+	outputData=32'bz;
+	end
+
+	else if(ref1[inputAdd[9:2]]==0)
+	begin
+	tag1[inputAdd[9:2]]=inputAdd[31:10];
+	valid1[inputAdd[9:2]]=1;
+	ref1[inputAdd[9:2]]=1;
+	data1[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+	outputData=32'bz;
+	end
+
+	else if(ref2[inputAdd[9:2]]==0)
+	begin
+	tag2[inputAdd[9:2]]=inputAdd[31:10];
+	valid2[inputAdd[9:2]]=1;
+	ref2[inputAdd[9:2]]=1;
+	data2[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+	outputData=32'bz;
+	end
+
+	else if(ref3[inputAdd[9:2]]==0)
+	begin
+	tag3[inputAdd[9:2]]=inputAdd[31:10];
+	valid3[inputAdd[9:2]]=1;
+	ref3[inputAdd[9:2]]=1;
+	data3[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+	outputData=32'bz;
+	end
+
+
+
 	else
 	begin
 	tag0[inputAdd[9:2]]=inputAdd[31:10];
 	valid0[inputAdd[9:2]]=1;
+	ref0[inputAdd[9:2]]=1;
 	data0[inputAdd[9:2]]=inputData;
 	data[inputAdd]=inputData;
 	outputData=32'bx;
@@ -226,6 +278,7 @@ begin
 $monitor($time,,"op=%d inputAdd=%d hit=%d outputData=%d clk=%d tag0=%d tag1=%d tag2=%d tag3=%d tag=%d %d",op,inputAdd,hit,outputData,clk,outTag0,outTag1,outTag2,outTag3,inputAdd[31:10],k);
 clk=1;
 
+
 valid0[16]=0;
 valid1[16]=0;
 valid2[16]=0;
@@ -238,6 +291,21 @@ always
 begin
 #2 
 clk=~clk;
+end
+
+always 
+begin
+#8
+
+for(k=0;k<256;k=k+1)
+begin
+ref0[k]=0;
+ref1[k]=0;
+ref2[k]=0;
+ref3[k]=0;
+end
+
+
 end
 
 
@@ -258,6 +326,39 @@ initial
 begin
 
 
+/*
+
+op=1;
+inputAdd=64;
+inputData=111;
+#3
+op=1;
+inputAdd=1088;
+inputData=222;
+#3
+op=1;
+inputAdd=3136;
+inputData=333;
+#4
+op=1;
+inputAdd=7232;
+inputData=333;
+#4
+op=1;
+inputAdd=2112;
+inputData=5000;
+#3
+op=0;
+inputAdd=2112;
+#3
+op=0;
+inputAdd=64;
+#6
+op=0;
+inputAdd=2112;
+#6
+
+*/
 
 
 op=1;
@@ -275,12 +376,6 @@ inputData=333;
 op=1;
 inputAdd=7232;
 inputData=333;
-
-/*
-op=1;
-inputAdd=2112;
-inputData=555;
-*/
 #4
 op=1;
 inputAdd=2112;
@@ -295,7 +390,6 @@ inputAdd=64;
 op=0;
 inputAdd=2112;
 #6
-
 
 
 $finish;
