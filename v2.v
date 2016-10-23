@@ -203,7 +203,7 @@ if((valid0[inputAdd[9:2]]==0)||(valid0[inputAdd[9:2]]==1'bx))
 	outputData=32'bx;
 	end
 	//There will be else that will be changed later to the idea of least recently used
-	/*
+	
 	else
 	begin
 	tag0[inputAdd[9:2]]=inputAdd[31:10];
@@ -212,7 +212,7 @@ if((valid0[inputAdd[9:2]]==0)||(valid0[inputAdd[9:2]]==1'bx))
 	data[inputAdd]=inputData;
 	outputData=32'bx;
 	end
-	*/
+	
 	
 
 end
@@ -226,6 +226,10 @@ begin
 $monitor($time,,"op=%d inputAdd=%d hit=%d outputData=%d clk=%d tag0=%d tag1=%d tag2=%d tag3=%d tag=%d %d",op,inputAdd,hit,outputData,clk,outTag0,outTag1,outTag2,outTag3,inputAdd[31:10],k);
 clk=1;
 
+valid0[16]=0;
+valid1[16]=0;
+valid2[16]=0;
+valid3[16]=0;
 
 
 end
@@ -286,8 +290,11 @@ op=0;
 inputAdd=2112;
 #3
 op=0;
+inputAdd=64;
+#6
+op=0;
 inputAdd=2112;
-#3
+#6
 
 
 

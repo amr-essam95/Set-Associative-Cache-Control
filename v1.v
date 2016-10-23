@@ -1,3 +1,6 @@
+
+
+
 module ModellingCache(operation,inToCache,inputData,outTag0,outTag1,outTag2,outTag3,outValid0,outValid1,outValid2,outValid3,outData0,outData1,outData2,outData3,clk);
 //if operation =0 then read and otherwise write
 input  operation;
