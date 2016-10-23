@@ -273,16 +273,20 @@ end
 end
 
 reg clk;
+integer j;
 initial
 begin
 $monitor($time,,"op=%d inputAdd=%d hit=%d outputData=%d clk=%d tag0=%d tag1=%d tag2=%d tag3=%d tag=%d %d",op,inputAdd,hit,outputData,clk,outTag0,outTag1,outTag2,outTag3,inputAdd[31:10],k);
 clk=1;
 
 
-valid0[16]=0;
-valid1[16]=0;
-valid2[16]=0;
-valid3[16]=0;
+for(j=0;j<256;j=j+1)
+begin
+valid0[j]=0;
+valid1[j]=0;
+valid2[j]=0;
+valid3[j]=0;
+end
 
 
 end
