@@ -124,6 +124,7 @@ if(valid0[inputAdd[9:2]]==0||valid0[inputAdd[9:2]]==1'bx)
 	valid0[inputAdd[9:2]]=1;
 	data0[inputAdd[9:2]]=data[inputAdd];
 	outputData=data[inputAdd];
+	ref0[inputAdd[9:2]]=1;
 	end
 
 	else if(valid1[inputAdd[9:2]]==0||valid1[inputAdd[9:2]]==1'bx)
@@ -132,6 +133,7 @@ if(valid0[inputAdd[9:2]]==0||valid0[inputAdd[9:2]]==1'bx)
 	valid1[inputAdd[9:2]]=1;
 	data1[inputAdd[9:2]]=data[inputAdd];
 	outputData=data[inputAdd];
+	ref1[inputAdd[9:2]]=1;
 	end
 
 	else if(valid2[inputAdd[9:2]]==0||valid2[inputAdd[9:2]]==1'bx)
@@ -140,6 +142,7 @@ if(valid0[inputAdd[9:2]]==0||valid0[inputAdd[9:2]]==1'bx)
 	valid2[inputAdd[9:2]]=1;
 	data2[inputAdd[9:2]]=data[inputAdd];
 	outputData=data[inputAdd];
+	ref2[inputAdd[9:2]]=1;
 	end
 
 	else if(valid3[inputAdd[9:2]]==0||valid3[inputAdd[9:2]]==1'bx)
@@ -148,8 +151,48 @@ if(valid0[inputAdd[9:2]]==0||valid0[inputAdd[9:2]]==1'bx)
 	valid3[inputAdd[9:2]]=1;
 	data3[inputAdd[9:2]]=data[inputAdd];
 	outputData=data[inputAdd];
+	ref3[inputAdd[9:2]]=1;
 	end
 	//There will be else that will be changed later to the idea of least recently used
+	
+	else if(ref0[inputAdd[9:2]]==0)
+	begin 
+	tag0[inputAdd[9:2]]=inputAdd[31:10];
+	valid0[inputAdd[9:2]]=1;
+	data0[inputAdd[9:2]]=data[inputAdd];
+	outputData=data[inputAdd];
+	ref0[inputAdd[9:2]]=1;
+	end
+
+	else if(ref1[inputAdd[9:2]]==0)
+	begin
+	tag1[inputAdd[9:2]]=inputAdd[31:10];
+	valid1[inputAdd[9:2]]=1;
+	data1[inputAdd[9:2]]=data[inputAdd];
+	outputData=data[inputAdd];
+	ref1[inputAdd[9:2]]=1;
+	end
+
+	else if(ref2[inputAdd[9:2]]==0)
+	begin
+	tag2[inputAdd[9:2]]=inputAdd[31:10];
+	valid2[inputAdd[9:2]]=1;
+	data2[inputAdd[9:2]]=data[inputAdd];
+	outputData=data[inputAdd];
+	ref2[inputAdd[9:2]]=1;
+	end
+
+	else if(ref3[inputAdd[9:2]]==0)
+	begin
+	tag3[inputAdd[9:2]]=inputAdd[31:10];
+	valid3[inputAdd[9:2]]=1;
+	data3[inputAdd[9:2]]=data[inputAdd];
+	outputData=data[inputAdd];
+	ref3[inputAdd[9:2]]=1;
+	end
+	
+
+
 	else
 	begin
 	tag0[inputAdd[9:2]]=inputAdd[31:10];
@@ -172,6 +215,39 @@ end
 else if(op==1)
 begin
 hit=1'bX;
+if(tag0[inputAdd[9:2]]==inputAdd[31:10])
+begin
+	ref0[inputAdd[9:2]]=1;
+	data0[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+end
+
+else if(tag1[inputAdd[9:2]]==inputAdd[31:10])
+begin
+	ref1[inputAdd[9:2]]=1;
+	data1[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+
+end
+
+else if(tag2[inputAdd[9:2]]==inputAdd[31:10])
+begin
+	ref2[inputAdd[9:2]]=1;
+	data2[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+
+end
+
+else if(tag3[inputAdd[9:2]]==inputAdd[31:10])
+begin
+	ref3[inputAdd[9:2]]=1;
+	data3[inputAdd[9:2]]=inputData;
+	data[inputAdd]=inputData;
+
+end
+
+else
+begin
 if((valid0[inputAdd[9:2]]==0)||(valid0[inputAdd[9:2]]==1'bx))
 	begin 
 	tag0[inputAdd[9:2]]=inputAdd[31:10];
@@ -266,7 +342,7 @@ if((valid0[inputAdd[9:2]]==0)||(valid0[inputAdd[9:2]]==1'bx))
 	end
 	
 	
-
+end
 end
 
 
@@ -286,6 +362,10 @@ valid0[j]=0;
 valid1[j]=0;
 valid2[j]=0;
 valid3[j]=0;
+ref0[j]=0;
+ref1[j]=0;
+ref2[j]=0;
+ref3[j]=0;
 end
 
 
@@ -351,7 +431,7 @@ inputData=333;
 op=1;
 inputAdd=2112;
 inputData=5000;
-#3
+#5
 op=0;
 inputAdd=2112;
 #3
@@ -368,7 +448,7 @@ inputAdd=2112;
 op=1;
 inputAdd=64;
 inputData=111;
-#3
+#6
 op=1;
 inputAdd=1088;
 inputData=222;
@@ -384,17 +464,45 @@ inputData=333;
 op=1;
 inputAdd=2112;
 inputData=5000;
-#3
+#5
 op=0;
 inputAdd=2112;
 #3
 op=0;
 inputAdd=64;
-#6
+#8
 op=0;
 inputAdd=2112;
-#6
+#10
 
+/*
+op=1;
+inputAdd=64;
+inputData=111;
+#6
+op=1;
+inputAdd=1088;
+inputData=222;
+#3
+op=1;
+inputAdd=3136;
+inputData=333;
+#4
+op=1;
+inputAdd=7232;
+inputData=333;
+#4
+op=1;
+inputAdd=2112;
+inputData=5000;
+#4
+op=0;
+inputAdd=2112;
+#4
+op=0;
+inputAdd=3136;
+#4
+*/
 
 $finish;
 
