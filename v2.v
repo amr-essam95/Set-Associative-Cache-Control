@@ -370,6 +370,13 @@ end
 
 
 end
+always@(negedge clk)
+begin
+hit=1'bz;
+outputData=31'bz;
+end
+
+
 
 always
 begin
@@ -379,7 +386,7 @@ end
 
 always 
 begin
-#8
+#16
 
 for(k=0;k<256;k=k+1)
 begin
@@ -443,8 +450,38 @@ inputAdd=2112;
 #6
 
 */
-
-
+//working test
+/*
+op=1;
+inputAdd=64;
+inputData=111;
+#6
+op=1;
+inputAdd=1088;
+inputData=222;
+#3
+op=1;
+inputAdd=3136;
+inputData=333;
+#4
+op=1;
+inputAdd=7232;
+inputData=333;
+#4
+op=1;
+inputAdd=2112;
+inputData=5000;
+#5
+op=0;
+inputAdd=2112;
+#3
+op=0;
+inputAdd=64;
+#8
+op=0;
+inputAdd=2112;
+#10
+*/
 op=1;
 inputAdd=64;
 inputData=111;
